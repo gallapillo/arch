@@ -1,6 +1,5 @@
 #include "myReadkey.h"
 #include <unistd.h>
-#include <stdlib.h>
 
 int rk_mytermregime(int regime, int vtime, int vmin, int echo, int sigint) {
     struct termios new_termios;

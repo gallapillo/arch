@@ -1,6 +1,6 @@
 #include "myReadkey.h"
-#include <stdio.h>
 #include <unistd.h>
+#include <stdio.h>
 #include <sys/select.h>
 #include <ctype.h>
 

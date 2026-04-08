@@ -46,7 +46,9 @@ int checkScreenSize(void) {
 }
 
 void drawUI(void) {
-    // Очистка области с рамками
+    mt_clrscr();
+    
+    // Заголовки
     mt_setfgcolor(COLOR_WHITE);
     mt_setbgcolor(COLOR_BLUE);
     
@@ -55,24 +57,6 @@ void drawUI(void) {
     
     mt_gotoXY(1, 45);
     printf("=== РЕГИСТРЫ ===");
-    
-    mt_gotoXY(5, 45);
-    printf("Аккумулятор:     ");
-    
-    mt_gotoXY(7, 45);
-    printf("Счетчик команд:  ");
-    
-    mt_gotoXY(10, 45);
-    printf("Флаги:           ");
-    
-    mt_gotoXY(13, 45);
-    printf("Команда:         ");
-    
-    mt_gotoXY(16, 45);
-    printf("Декодированная ячейка:");
-    
-    mt_gotoXY(19, 2);
-    printf("=== ВВОД-ВЫВОД ===");
     
     mt_gotoXY(1, 65);
     printf("=== УВЕЛИЧЕННОЕ ЗНАЧЕНИЕ ===");
@@ -84,6 +68,24 @@ void drawUI(void) {
     bc_box(1, 45, 18, 64, COLOR_WHITE, COLOR_BLACK, NULL, COLOR_WHITE, COLOR_BLACK);
     bc_box(4, 65, 12, 95, COLOR_WHITE, COLOR_BLACK, "BIG CHAR", COLOR_YELLOW, COLOR_BLACK);
     bc_box(19, 1, 24, 95, COLOR_WHITE, COLOR_BLACK, "IN-OUT", COLOR_YELLOW, COLOR_BLACK);
+    
+    // Метки регистров
+    mt_gotoXY(3, 47);
+    mt_setfgcolor(COLOR_CYAN);
+    printf("Аккумулятор:");
+    
+    mt_gotoXY(5, 47);
+    printf("Счетчик команд:");
+    
+    mt_gotoXY(7, 47);
+    printf("Флаги:");
+    
+    mt_gotoXY(9, 47);
+    printf("Команда:");
+    
+    mt_gotoXY(11, 47);
+    printf("Декодированная ячейка:");
+    mt_setdefaultcolor();
     
     // Подсказки
     mt_gotoXY(26, 2);
@@ -127,6 +129,13 @@ void updateDisplay(void) {
     
     // Вывод большой ячейки
     sc_printBigCell(current_address);
+    
+    // Обновление курсора в позиции текущей ячейки
+    if (!edit_mode) {
+        int row = MEMORY_START_ROW + current_address / MEMORY_COLS;
+        int col = MEMORY_START_COL + (current_address % MEMORY_COLS) * 6;
+        mt_gotoXY(row, col);
+    }
 }
 
 void moveCursor(int direction) {
@@ -164,7 +173,7 @@ void editCell(void) {
     // Выводим ячейку в режиме редактирования
     sc_printCell(current_address, COLOR_YELLOW, COLOR_RED);
     
-    // Перемещаем курсор в позицию для ввода
+    // Перемещаем курсор в позицию для ввода (после знака)
     int row = MEMORY_START_ROW + current_address / MEMORY_COLS;
     int col = MEMORY_START_COL + (current_address % MEMORY_COLS) * 6 + 5;
     mt_gotoXY(row, col);
@@ -185,20 +194,19 @@ void editAccumulator(void) {
     sc_accumulatorGet(&old_value);
     
     // Позиция для редактирования
-    mt_gotoXY(5, 60);
+    mt_gotoXY(3, 60);
     mt_setfgcolor(COLOR_YELLOW);
     mt_setbgcolor(COLOR_RED);
-    
-    printf("%04X", old_value & 0xFFFF);
-    mt_gotoXY(5, 60);
+    printf("%04X    ", old_value & 0xFFFF);
+    mt_gotoXY(3, 60);
     
     int result = rk_readvalue(&new_value, -1);
     
+    mt_setdefaultcolor();
     if (result == 0) {
         sc_accumulatorSet(new_value);
     }
     
-    mt_setdefaultcolor();
     updateDisplay();
 }
 
@@ -207,20 +215,19 @@ void editIcounter(void) {
     sc_icounterGet(&old_value);
     
     // Позиция для редактирования
-    mt_gotoXY(7, 62);
+    mt_gotoXY(5, 62);
     mt_setfgcolor(COLOR_YELLOW);
     mt_setbgcolor(COLOR_RED);
-    
-    printf("%04X", old_value & 0xFFFF);
-    mt_gotoXY(7, 62);
+    printf("%04X    ", old_value & 0xFFFF);
+    mt_gotoXY(5, 62);
     
     int result = rk_readvalue(&new_value, -1);
     
+    mt_setdefaultcolor();
     if (result == 0 && new_value >= 0 && new_value < MEMORY_SIZE) {
         sc_icounterSet(new_value);
     }
     
-    mt_setdefaultcolor();
     updateDisplay();
 }
 
@@ -235,7 +242,7 @@ void saveMemory(void) {
     
     // Очищаем сообщение
     mt_gotoXY(20, 5);
-    printf("                            ");
+    printf("                           ");
     updateDisplay();
 }
 
@@ -249,7 +256,7 @@ void loadMemory(void) {
     usleep(500000);
     
     mt_gotoXY(20, 5);
-    printf("                            ");
+    printf("                           ");
     updateDisplay();
 }
 
@@ -400,8 +407,7 @@ int main(int argc, char *argv[]) {
     // Скрываем курсор
     mt_setcursorvisible(0);
     
-    // Очистка экрана и отрисовка интерфейса
-    mt_clrscr();
+    // Отрисовка интерфейса
     drawUI();
     updateDisplay();
     
