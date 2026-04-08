@@ -11,7 +11,8 @@ OBJS = sc_memoryInit.o sc_memorySet.o sc_memoryGet.o sc_memorySave.o \
        sc_commandEncode.o sc_commandDecode.o sc_commandValidate.o \
        sc_variables.o sc_printCell.o sc_printFlags.o sc_printDecodedCommand.o \
        sc_printAccumulator.o sc_printCounters.o \
-       sc_printCommand.o sc_printTerm.o sc_printBigCell.o
+       sc_printCommand.o sc_printTerm.o sc_printBigCell.o \
+       sc_cache.o sc_interrupt.o
 
 all: $(LIB)
 
