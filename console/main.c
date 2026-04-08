@@ -4,29 +4,37 @@
 #include <termios.h>
 #include "mySimpleComputer.h"
 #include "myTerm.h"
+#include "myBigChars.h"
 
-// Проверка, является ли поток терминалом
+// Прототипы
+int isTerminal(void);
+int checkScreenSize(void);
+void drawUI(void);
+void printAllMemory(int currentAddress);
+
+// Внешние функции из mySimpleComputer
+extern int sc_loadFont(const char *filename);
+extern void sc_printBigCell(int address);
+
 int isTerminal(void) {
     return isatty(STDOUT_FILENO);
 }
 
-// Проверка размера экрана
 int checkScreenSize(void) {
     int rows, cols;
     if (mt_getscreensize(&rows, &cols) == -1) {
         return -1;
     }
     
-    // Минимальные требования: 25 строк и 80 столбцов
-    if (rows < 25 || cols < 80) {
-        printf("Ошибка: размер терминала должен быть не менее 25x80\n");
+    // Минимальные требования: 30 строк и 100 столбцов для большой ячейки
+    if (rows < 30 || cols < 100) {
+        printf("Ошибка: размер терминала должен быть не менее 30x100\n");
         printf("Текущий размер: %dx%d\n", rows, cols);
         return -1;
     }
     return 0;
 }
 
-// Вывод рамок и заголовков
 void drawUI(void) {
     mt_setfgcolor(COLOR_WHITE);
     mt_setbgcolor(COLOR_BLUE);
@@ -56,10 +64,18 @@ void drawUI(void) {
     mt_gotoXY(19, 2);
     printf("=== ВВОД-ВЫВОД ===");
     
+    mt_gotoXY(1, 65);
+    printf("=== УВЕЛИЧЕННОЕ ЗНАЧЕНИЕ ===");
+    
     mt_setdefaultcolor();
+    
+    // Псевдографические рамки
+    bc_box(2, 1, 18, 44, COLOR_WHITE, COLOR_BLACK, NULL, COLOR_WHITE, COLOR_BLACK);
+    bc_box(1, 45, 18, 64, COLOR_WHITE, COLOR_BLACK, NULL, COLOR_WHITE, COLOR_BLACK);
+    bc_box(4, 65, 12, 95, COLOR_WHITE, COLOR_BLACK, "BIG CHAR", COLOR_YELLOW, COLOR_BLACK);
+    bc_box(19, 1, 24, 95, COLOR_WHITE, COLOR_BLACK, "IN-OUT", COLOR_YELLOW, COLOR_BLACK);
 }
 
-// Вывод всех ячеек памяти
 void printAllMemory(int currentAddress) {
     for (int i = 0; i < MEMORY_SIZE; i++) {
         if (i == currentAddress) {
@@ -70,7 +86,13 @@ void printAllMemory(int currentAddress) {
     }
 }
 
-int main(void) {
+int main(int argc, char *argv[]) {
+    const char *font_file = "font.bin";
+    
+    if (argc > 1) {
+        font_file = argv[1];
+    }
+    
     printf("\033[?25l"); // Скрываем курсор
     
     // Проверка терминала
@@ -81,6 +103,15 @@ int main(void) {
     
     // Проверка размера экрана
     if (checkScreenSize() == -1) {
+        return 1;
+    }
+    
+    // Загрузка шрифта
+    if (sc_loadFont(font_file) == -1) {
+        mt_clrscr();
+        mt_gotoXY(1, 1);
+        printf("Ошибка: не удалось загрузить файл шрифта '%s'\n", font_file);
+        printf("Запустите программу font.c для генерации шрифта\n");
         return 1;
     }
     
@@ -127,6 +158,9 @@ int main(void) {
     sc_memoryGet(0, &currentValue);
     sc_printDecodedCommand(currentValue);
     
+    // Вывод большой ячейки
+    sc_printBigCell(0);
+    
     // Вывод в блок IN-OUT (7 значений)
     sc_printTerm(0, 0);
     sc_printTerm(1, 0);
@@ -134,10 +168,10 @@ int main(void) {
     sc_printTerm(10, 0);
     sc_printTerm(11, 0);
     sc_printTerm(12, 0);
-    sc_printTerm(3, 1);  // Ожидание ввода
+    sc_printTerm(3, 1);
     
     // Перемещение курсора в нижнюю часть экрана
-    mt_gotoXY(24, 1);
+    mt_gotoXY(26, 1);
     mt_setfgcolor(COLOR_YELLOW);
     printf("Нажмите Enter для выхода...");
     mt_setdefaultcolor();
