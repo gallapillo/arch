@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -I../include
-LDFLAGS = -L../mySimpleComputer -L../myTerm -L../myBigChars \
-          -lmySimpleComputer -lmyTerm -lmyBigChars
+LDFLAGS = -L../mySimpleComputer -L../myTerm -L../myBigChars -L../myReadkey \
+          -lmySimpleComputer -lmyTerm -lmyBigChars -lmyReadkey
 
 TARGET = console
 FONT_TARGET = font
@@ -14,7 +14,8 @@ all: $(TARGET) $(FONT_TARGET)
 
 $(TARGET): $(OBJS) ../mySimpleComputer/libmySimpleComputer.a \
                    ../myTerm/libmyTerm.a \
-                   ../myBigChars/libmyBigChars.a
+                   ../myBigChars/libmyBigChars.a \
+                   ../myReadkey/libmyReadkey.a
 	$(CC) $(OBJS) -o $@ $(LDFLAGS)
 
 $(FONT_TARGET): $(FONT_OBJS) ../myBigChars/libmyBigChars.a
@@ -32,10 +33,14 @@ $(FONT_TARGET): $(FONT_OBJS) ../myBigChars/libmyBigChars.a
 ../myBigChars/libmyBigChars.a:
 	$(MAKE) -C ../myBigChars
 
+../myReadkey/libmyReadkey.a:
+	$(MAKE) -C ../myReadkey
+
 clean:
 	rm -f $(OBJS) $(FONT_OBJS) $(TARGET) $(FONT_TARGET)
 	$(MAKE) -C ../mySimpleComputer clean
 	$(MAKE) -C ../myTerm clean
 	$(MAKE) -C ../myBigChars clean
+	$(MAKE) -C ../myReadkey clean
 
 .PHONY: all clean

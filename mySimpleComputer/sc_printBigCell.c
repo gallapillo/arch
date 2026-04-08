@@ -7,7 +7,6 @@
 static int font[FONT_SIZE][2];
 static int font_loaded = 0;
 
-// Загрузка шрифта из файла
 int sc_loadFont(const char *filename) {
     int fd = open(filename, O_RDONLY);
     if (fd == -1) {
@@ -36,25 +35,13 @@ void sc_printBigCell(int address) {
     int hex_digit = (value >> 12) & 0x0F;
     int index;
     
-    // Преобразование hex в индекс шрифта
     if (hex_digit >= 0 && hex_digit <= 9) {
         index = hex_digit;
-    } else if (hex_digit == 0xA) {
-        index = 10; // A
-    } else if (hex_digit == 0xB) {
-        index = 11; // B
-    } else if (hex_digit == 0xC) {
-        index = 12; // C
-    } else if (hex_digit == 0xD) {
-        index = 13; // D
-    } else if (hex_digit == 0xE) {
-        index = 14; // E
-    } else if (hex_digit == 0xF) {
-        index = 15; // F
+    } else if (hex_digit >= 0xA && hex_digit <= 0xF) {
+        index = 10 + (hex_digit - 0xA);
     } else {
         return;
     }
     
-    // Вывод большого символа в правой части экрана
-    bc_printbigchar(font[index], 5, 65, COLOR_CYAN, COLOR_BLACK);
+    bc_printbigchar(font[index], 5, 67, COLOR_CYAN, COLOR_BLACK);
 }

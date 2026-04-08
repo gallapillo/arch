@@ -48,7 +48,7 @@ int sc_commandEncode(int sign, int command, int operand, int *value);
 int sc_commandDecode(int value, int *sign, int *command, int *operand);
 int sc_commandValidate(int command);
 
-// Обновленные функции вывода
+// Функции вывода
 void sc_printCell(int address, enum colors fg, enum colors bg);
 void sc_printFlags(void);
 void sc_printDecodedCommand(int value);
@@ -56,23 +56,27 @@ void sc_printAccumulator(void);
 void sc_printCounters(void);
 void sc_printTerm(int address, int isInput);
 void sc_printCommand(void);
+void sc_printBigCell(int address);
+
+// Функции загрузки шрифта
+int sc_loadFont(const char *filename);
 
 // Константы для расположения блоков
 #define MEMORY_START_ROW    3
 #define MEMORY_START_COL    2
 #define MEMORY_COLS         10
-#define FLAGS_ROW           2
-#define FLAGS_COL           45
-#define ACCUM_ROW           6
-#define ACCUM_COL           45
-#define ICOUNTER_ROW        8
-#define ICOUNTER_COL        45
-#define COMMAND_ROW         12
-#define COMMAND_COL         45
-#define DECODED_ROW         14
-#define DECODED_COL         45
-#define TERM_START_ROW      18
-#define TERM_START_COL      2
+#define FLAGS_ROW           10
+#define FLAGS_COL           55
+#define ACCUM_ROW           5
+#define ACCUM_COL           55
+#define ICOUNTER_ROW        7
+#define ICOUNTER_COL        55
+#define COMMAND_ROW         13
+#define COMMAND_COL         55
+#define DECODED_ROW         16
+#define DECODED_COL         55
+#define TERM_START_ROW      20
+#define TERM_START_COL      4
 #define TERM_LINES          4
 
 #endif
