@@ -18,35 +18,30 @@ int bc_box(int x1, int y1, int x2, int y2,
     mt_setfgcolor(box_fg);
     mt_setbgcolor(box_bg);
     
-    // Вход в режим псевдографики
-    write(STDOUT_FILENO, "\033(0", 3);
-    
+    // Используем UTF-8 псевдографику (более совместимо с macOS)
     // Верхняя граница
     mt_gotoXY(x1, y1);
-    write(STDOUT_FILENO, "l", 1);  // левый верхний угол
+    printf("┌");
     for (int i = 1; i < width - 1; i++) {
-        write(STDOUT_FILENO, "q", 1);  // горизонталь
+        printf("─");
     }
-    write(STDOUT_FILENO, "k", 1);  // правый верхний угол
+    printf("┐");
     
     // Боковые границы
     for (int i = 1; i < height - 1; i++) {
         mt_gotoXY(x1 + i, y1);
-        write(STDOUT_FILENO, "x", 1);  // вертикаль
+        printf("│");
         mt_gotoXY(x1 + i, y1 + width - 1);
-        write(STDOUT_FILENO, "x", 1);  // вертикаль
+        printf("│");
     }
     
     // Нижняя граница
     mt_gotoXY(x1 + height - 1, y1);
-    write(STDOUT_FILENO, "m", 1);  // левый нижний угол
+    printf("└");
     for (int i = 1; i < width - 1; i++) {
-        write(STDOUT_FILENO, "q", 1);  // горизонталь
+        printf("─");
     }
-    write(STDOUT_FILENO, "j", 1);  // правый нижний угол
-    
-    // Выход из режима псевдографики
-    write(STDOUT_FILENO, "\033(B", 3);
+    printf("┘");
     
     // Вывод заголовка
     if (header != NULL && bc_strlen(header) > 0) {

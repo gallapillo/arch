@@ -25,12 +25,17 @@ int rk_mytermregime(int regime, int vtime, int vmin, int echo, int sigint) {
         new_termios.c_lflag &= ~ECHO;
     }
     
-    // Управление сигналом SIGINT
+    // Управление сигналом SIGINT (Ctrl+C)
     if (sigint) {
         new_termios.c_lflag |= ISIG;
     } else {
         new_termios.c_lflag &= ~ISIG;
     }
+    
+    // Отключаем канонический режим ввода и обработку сигналов
+    new_termios.c_lflag &= ~(ICANON | ECHO | ISIG);
+    new_termios.c_cc[VMIN] = 1;
+    new_termios.c_cc[VTIME] = 0;
     
     if (tcsetattr(STDIN_FILENO, TCSANOW, &new_termios) == -1) {
         return -1;

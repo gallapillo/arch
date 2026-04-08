@@ -10,9 +10,6 @@ int bc_printbigchar(int *big, int x, int y, enum colors fg, enum colors bg) {
     mt_setfgcolor(fg);
     mt_setbgcolor(bg);
     
-    // Вход в режим псевдографики для символа закрашивания
-    write(STDOUT_FILENO, "\033(0", 3);
-    
     for (int row = 0; row < 8; row++) {
         mt_gotoXY(x + row, y);
         
@@ -22,16 +19,13 @@ int bc_printbigchar(int *big, int x, int y, enum colors fg, enum colors bg) {
         for (int col = 0; col < 8; col++) {
             int bit = (target[0] >> (byte + col)) & 1;
             if (bit) {
-                write(STDOUT_FILENO, "h", 1);  // ACS_CKBOARD
+                printf("█");  // Закрашенный блок (UTF-8)
             } else {
-                write(STDOUT_FILENO, " ", 1);
+                printf(" ");
             }
         }
     }
     
-    // Выход из режима псевдографики
-    write(STDOUT_FILENO, "\033(B", 3);
     mt_setdefaultcolor();
-    
     return 0;
 }

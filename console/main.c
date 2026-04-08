@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <signal.h>
+#include <fcntl.h>
 #include "mySimpleComputer.h"
 #include "myTerm.h"
 #include "myBigChars.h"
@@ -22,6 +23,9 @@ void handleKey(void);
 void editCell(void);
 void editAccumulator(void);
 void editIcounter(void);
+void saveMemory(void);
+void loadMemory(void);
+void initAll(void);
 
 // Внешние функции
 extern int sc_loadFont(const char *filename);
@@ -34,11 +38,13 @@ int isTerminal(void) {
 int checkScreenSize(void) {
     int rows, cols;
     if (mt_getscreensize(&rows, &cols) == -1) {
-        return -1;
+        // Если не удалось получить размер, используем значения по умолчанию
+        rows = 30;
+        cols = 100;
     }
     
-    if (rows < 30 || cols < 100) {
-        printf("Ошибка: размер терминала должен быть не менее 30x100\n");
+    if (rows < 25 || cols < 80) {
+        printf("Ошибка: размер терминала должен быть не менее 25x80\n");
         printf("Текущий размер: %dx%d\n", rows, cols);
         return -1;
     }
@@ -232,13 +238,13 @@ void editIcounter(void) {
 }
 
 void saveMemory(void) {
-    sc_memorySave("memory.bin");
-    
-    mt_gotoXY(20, 5);
-    mt_setfgcolor(COLOR_GREEN);
-    printf("Память сохранена в memory.bin");
-    mt_setdefaultcolor();
-    usleep(500000);
+    if (sc_memorySave("memory.bin") == 0) {
+        mt_gotoXY(20, 5);
+        mt_setfgcolor(COLOR_GREEN);
+        printf("Память сохранена в memory.bin");
+        mt_setdefaultcolor();
+        usleep(500000);
+    }
     
     // Очищаем сообщение
     mt_gotoXY(20, 5);
@@ -247,13 +253,13 @@ void saveMemory(void) {
 }
 
 void loadMemory(void) {
-    sc_memoryLoad("memory.bin");
-    
-    mt_gotoXY(20, 5);
-    mt_setfgcolor(COLOR_GREEN);
-    printf("Память загружена из memory.bin");
-    mt_setdefaultcolor();
-    usleep(500000);
+    if (sc_memoryLoad("memory.bin") == 0) {
+        mt_gotoXY(20, 5);
+        mt_setfgcolor(COLOR_GREEN);
+        printf("Память загружена из memory.bin");
+        mt_setdefaultcolor();
+        usleep(500000);
+    }
     
     mt_gotoXY(20, 5);
     printf("                           ");

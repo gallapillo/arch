@@ -18,12 +18,12 @@ int rk_readkey(enum keys *key) {
     }
     
     // ENTER
-    if (n == 1 && buf[0] == '\n') {
+    if (n == 1 && (buf[0] == '\n' || buf[0] == '\r')) {
         *key = KEY_ENTER;
         return 0;
     }
     
-    // Стрелки и функциональные клавиши (последовательности ESC)
+    // macOS/iTerm2 последовательности для стрелок
     if (n >= 2 && buf[0] == '\033' && buf[1] == '[') {
         if (n == 3) {
             switch (buf[2]) {
@@ -42,6 +42,25 @@ int rk_readkey(enum keys *key) {
         if (n >= 4 && buf[2] == '1' && buf[3] == '7') {
             *key = KEY_F6;
             return 0;
+        }
+        // Альтернативные последовательности для F5/F6 в некоторых терминалах macOS
+        if (n == 4 && buf[2] == '1' && buf[3] == '5') {
+            *key = KEY_F5;
+            return 0;
+        }
+        if (n == 4 && buf[2] == '1' && buf[3] == '7') {
+            *key = KEY_F6;
+            return 0;
+        }
+    }
+    
+    // Альтернативные последовательности для стрелок (в некоторых терминалах)
+    if (n >= 3 && buf[0] == '\033' && buf[1] == 'O') {
+        switch (buf[2]) {
+            case 'A': *key = KEY_UP; return 0;
+            case 'B': *key = KEY_DOWN; return 0;
+            case 'C': *key = KEY_RIGHT; return 0;
+            case 'D': *key = KEY_LEFT; return 0;
         }
     }
     
