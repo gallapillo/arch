@@ -3,7 +3,7 @@
 #include <unistd.h>
 
 int mt_gotoXY(int row, int col) {
-    if (row < 0 || col < 0) {
+    if (row < 1 || col < 1) {  // В терминале строки и столбцы начинаются с 1
         return -1;
     }
     
@@ -12,5 +12,6 @@ int mt_gotoXY(int row, int col) {
     if (write(STDOUT_FILENO, buffer, len) == -1) {
         return -1;
     }
+    fflush(stdout);
     return 0;
 }

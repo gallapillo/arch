@@ -14,11 +14,15 @@ void sc_printCell(int address, enum colors fg, enum colors bg) {
     mt_setfgcolor(fg);
     mt_setbgcolor(bg);
     
-    int value = memory[address];
+    int value;
+    sc_memoryGet(address, &value);
+    
     int sign, command, operand;
     sc_commandDecode(value, &sign, &command, &operand);
     
+    // Формат: +00 00 (с пробелом)
     printf("%c%02X%02X", sign ? '-' : '+', command, operand);
     
     mt_setdefaultcolor();
+    fflush(stdout);  // Принудительный вывод
 }

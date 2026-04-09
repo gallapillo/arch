@@ -63,17 +63,17 @@ int sc_loadFont(const char *filename);
 
 // Константы для расположения блоков
 #define MEMORY_START_ROW    3
-#define MEMORY_START_COL    2
+#define MEMORY_START_COL    3
 #define MEMORY_COLS         10
-#define FLAGS_ROW           10
+#define FLAGS_ROW           7
 #define FLAGS_COL           55
-#define ACCUM_ROW           5
+#define ACCUM_ROW           3
 #define ACCUM_COL           55
-#define ICOUNTER_ROW        7
+#define ICOUNTER_ROW        5
 #define ICOUNTER_COL        55
-#define COMMAND_ROW         13
+#define COMMAND_ROW         9
 #define COMMAND_COL         55
-#define DECODED_ROW         16
+#define DECODED_ROW         11
 #define DECODED_COL         55
 #define TERM_START_ROW      20
 #define TERM_START_COL      4
