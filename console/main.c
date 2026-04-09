@@ -48,26 +48,60 @@ int checkScreenSize(void) {
 void drawUI(void) {
     mt_clrscr();
     
-    // Заголовки
+    // Заголовки - сначала очищаем области
     mt_setfgcolor(COLOR_WHITE);
     mt_setbgcolor(COLOR_BLUE);
     
+    // Оперативная память
     mt_gotoXY(1, 2);
     printf("=== ОПЕРАТИВНАЯ ПАМЯТЬ ===");
     
+    // Регистры
     mt_gotoXY(1, 45);
     printf("=== РЕГИСТРЫ ===");
     
+    // Увеличенное значение
     mt_gotoXY(1, 65);
     printf("=== УВЕЛИЧЕННОЕ ЗНАЧЕНИЕ ===");
     
     mt_setdefaultcolor();
+    fflush(stdout);
     
-    // Псевдографические рамки
-    bc_box(2, 1, 18, 44, COLOR_WHITE, COLOR_BLACK, NULL, COLOR_WHITE, COLOR_BLACK);
-    bc_box(1, 45, 18, 64, COLOR_WHITE, COLOR_BLACK, NULL, COLOR_WHITE, COLOR_BLACK);
-    bc_box(4, 65, 12, 95, COLOR_WHITE, COLOR_BLACK, "BIG CHAR", COLOR_YELLOW, COLOR_BLACK);
-    bc_box(19, 1, 24, 95, COLOR_WHITE, COLOR_BLACK, "IN-OUT", COLOR_YELLOW, COLOR_BLACK);
+    // Псевдографические рамки - используем простые символы для macOS
+    mt_setfgcolor(COLOR_WHITE);
+    mt_setbgcolor(COLOR_BLACK);
+    
+    // Рамка памяти (строки 2-18, столбцы 1-44)
+    for (int i = 2; i <= 18; i++) {
+        mt_gotoXY(i, 1);
+        printf("|");
+        mt_gotoXY(i, 44);
+        printf("|");
+    }
+    mt_gotoXY(2, 1);
+    printf("+");
+    mt_gotoXY(2, 44);
+    printf("+");
+    mt_gotoXY(18, 1);
+    printf("+");
+    mt_gotoXY(18, 44);
+    printf("+");
+    
+    // Рамка регистров (строки 1-18, столбцы 45-64)
+    for (int i = 1; i <= 18; i++) {
+        mt_gotoXY(i, 45);
+        printf("|");
+        mt_gotoXY(i, 64);
+        printf("|");
+    }
+    mt_gotoXY(1, 45);
+    printf("+");
+    mt_gotoXY(1, 64);
+    printf("+");
+    mt_gotoXY(18, 45);
+    printf("+");
+    mt_gotoXY(18, 64);
+    printf("+");
     
     // Метки регистров
     mt_gotoXY(3, 47);
@@ -98,14 +132,22 @@ void drawUI(void) {
     mt_gotoXY(29, 2);
     printf("ESC - выход");
     mt_setdefaultcolor();
+    fflush(stdout);
 }
 
 void printAllMemory(void) {
+    // Очищаем область памяти перед выводом
+    for (int row = 0; row < 13; row++) {  // 13 строк по 10 ячеек
+        mt_gotoXY(MEMORY_START_ROW + row, MEMORY_START_COL);
+        mt_delline();  // Очищаем строку
+    }
+    
+    // Выводим все ячейки
     for (int i = 0; i < MEMORY_SIZE; i++) {
         if (i == current_address && !edit_mode) {
-            sc_printCell(i, COLOR_BLACK, COLOR_WHITE);  // Инверсный режим
+            sc_printCell(i, COLOR_BLACK, COLOR_WHITE);
         } else if (i == current_address && edit_mode) {
-            sc_printCell(i, COLOR_YELLOW, COLOR_RED);   // Режим редактирования
+            sc_printCell(i, COLOR_YELLOW, COLOR_RED);
         } else {
             sc_printCell(i, COLOR_WHITE, COLOR_BLACK);
         }
@@ -113,6 +155,14 @@ void printAllMemory(void) {
 }
 
 void updateDisplay(void) {
+    // Очищаем область памяти
+    for (int row = 0; row < 13; row++) {
+        mt_gotoXY(MEMORY_START_ROW + row, MEMORY_START_COL);
+        for (int col = 0; col < 60; col++) {
+            printf(" ");
+        }
+    }
+    
     // Вывод памяти
     printAllMemory();
     
@@ -130,12 +180,14 @@ void updateDisplay(void) {
     // Вывод большой ячейки
     sc_printBigCell(current_address);
     
-    // Обновление курсора в позиции текущей ячейки
+    // Обновление курсора
     if (!edit_mode) {
         int row = MEMORY_START_ROW + current_address / MEMORY_COLS;
         int col = MEMORY_START_COL + (current_address % MEMORY_COLS) * 6;
         mt_gotoXY(row, col);
     }
+    
+    fflush(stdout);
 }
 
 void moveCursor(int direction) {
