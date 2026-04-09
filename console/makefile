@@ -43,4 +43,7 @@ clean:
 	$(MAKE) -C ../myBigChars clean
 	$(MAKE) -C ../myReadkey clean
 
+pr_01:
+	gcc test.c -o pr_01
+
 .PHONY: all clean
